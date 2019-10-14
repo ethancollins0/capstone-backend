@@ -11,9 +11,9 @@ app.use(bodyParser.json())
 
 
 app.get('/', (req, res) => {
-    res.json('works backend')
+    axios.get('http://10.225.129.13:3001/')
+        .then(resp => res.json(resp.data))
 })
-
 
 
 const port = process.env.PORT || 3002
