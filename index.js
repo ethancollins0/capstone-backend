@@ -11,7 +11,7 @@ app.use(bodyParser.json())
 
 
 app.get('/', (req, res) => {
-    axios.get('http://10.225.129.13:3001/')
+    axios.get('http://64.124.131.146')
         .then(resp => res.json(resp.data))
 })
 
