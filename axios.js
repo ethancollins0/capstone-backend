@@ -6,5 +6,5 @@ function getData(ip) {
 }
 
 
-getData('http://10.225.129.13')
+getData('http://64.124.131.146')
     .then(console.log)

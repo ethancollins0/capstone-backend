@@ -10,9 +10,13 @@ app.use(bodyParser.urlencoded())
 app.use(bodyParser.json())
 
 
+app.post('/', (req, res) => {
+    res.json('Worked post to backend')
+    console.log(req.body)
+})
+
 app.get('/', (req, res) => {
-    axios.get('http://64.124.131.146')
-        .then(resp => res.json(resp.data))
+    res.json('worked get to backend')
 })
 
 
