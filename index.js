@@ -20,6 +20,10 @@ app.post('/soil_data', (req, res) => {
     res.json(`Body: ${req.body.name} and Headers: ${req.headers.authorization} to backend`)
 })
 
+app.post('/login', validateToken, (req, res) => {
+    res.json('hit login endpoint')
+})
+
 app.post('/signup', (req, res) => {
     const { name, email, password } = req.body
     console.log(name, email, password)
