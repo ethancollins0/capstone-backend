@@ -30,9 +30,11 @@ app.post('/pi', (req, res) => {
 
 app.post('/livedata', validateToken, (req, res) => {
     jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
-        err
-            ? res.json(err)
-            : res.json(decoded)
+        if (err){
+            res.json(err)
+        } else {
+            res.json(decoded)
+        }
     })
 })
 
