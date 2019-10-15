@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const axios = require('axios')
+const jwt = require('jsonwebtoken')
 
 const app = express()
 
@@ -20,7 +21,7 @@ app.get('/', (req, res) => {
 
 app.post('/pi', (req, res) => {
     req.body.email && req.body.pi_name
-        ? createToken(req.body.email, 1).then(token => res.json(token))
+        ? console.log(createToken(req.body.email, 1))
         : res.json(null)
 })
 
@@ -34,8 +35,8 @@ app.post('/livedata', validateToken, (req, res) => {
 
 
 function createToken(email, pi_id){
-    return jwt.sign({ email, pi_id}, process.env.SECRET, {expiresIn: 60 * 60 * 24 * 30}, (err, token) => { // 30 days
-        return token
+    return jwt.sign({ email, pi_id }, 'secret', {expiresIn: 60 * 60 * 24 * 30}, (err, token) => { // 30 days
+        console.log(token)
     })
 }
 
