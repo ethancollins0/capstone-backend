@@ -4,9 +4,12 @@ const cors = require('cors')
 const axios = require('axios')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
+const db = require('./db_queries')
 dotenv.config()
 
+
 const app = express()
+const User = require('./models/User')
 
 app.use(cors())
 app.use(bodyParser.urlencoded())
@@ -17,14 +20,24 @@ app.post('/soil_data', (req, res) => {
     res.json(`Body: ${req.body.name} and Headers: ${req.headers.authorization} to backend`)
 })
 
-app.get('/', (req, res) => {
-    res.json('worked get to backend')
+app.post('/signup', (req, res) => {
+    const { name, email, password } = req.body
+    console.log(name, email, password)
+    res.json('signup endpoint hit')
 })
 
-app.post('/pi', (req, res) => {
-    const { email } = req.body
-    req.body.email && req.body.pi_name
-        ? res.json(createToken({ email, pi_id: 1 }))
+app.get('/:id', (req, res) => {
+    let id = +req.params.id
+    User.query()
+        .where('id', id)
+        .eager('systems')
+        .then(user => res.json(user))
+})
+
+app.post('/pi', validateToken, (req, res) => {
+    const { user_id, pi } = req.body
+    user_id && pi.name && pi.description
+        ? res.json('here')
         : res.json(null)
 })
 
@@ -39,7 +52,6 @@ app.post('/livedata', validateToken, (req, res) => {
         }
     })
 })
-
 
 function createToken(data){
         return jwt.sign(data, process.env.SECRET, {expiresIn: 60 * 60 * 24 * 30})
