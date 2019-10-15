@@ -29,7 +29,9 @@ app.post('/pi', (req, res) => {
 })
 
 app.post('/livedata', validateToken, (req, res) => {
+    console.log(req.token)
     jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
+        console.log(decoded)
         if (err){
             res.json(err)
         } else {
