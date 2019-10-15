@@ -11,7 +11,7 @@ app.use(bodyParser.json())
 
 
 app.post('/', (req, res) => {
-    res.json(`Body: ${req.body.name} and Headers: ${req.headers} to backend`)
+    res.json(`Body: ${req.body.name} and Headers: ${req.headers.authorization} to backend`)
 })
 
 app.get('/', (req, res) => {
