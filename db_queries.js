@@ -26,13 +26,13 @@ function doesExist(email){
 function verifyUser(email, password){
     return doesExist(email)
         .then(array => {
-            if (array.length != 0){
+            if (array && array.length != 0){
                 return knex('users').where({ email })
                     .then(users => users[0])
                     .then(user => {
                         return bcrypt.compare(password, user.password).then(res => {
                             return res
-                                ? knex('users').where({ email })[0].id
+                                ? knex('users').where({ email: email }).first().then(user => user.id)
                                 : null
                         })
                     })

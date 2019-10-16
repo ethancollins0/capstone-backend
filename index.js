@@ -1,7 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const axios = require('axios')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 const db = require('./db_queries')
@@ -25,7 +24,7 @@ app.post('/login', (req, res) => {
     email && password
         ? db.verifyUser(email, password)
             .then(result => {
-                if (typeof result == 'number' && result == true){
+                if (result){
                     let token = createToken({ user_id: result, email })
                     res.json(token)
                 } else {
@@ -39,13 +38,13 @@ app.post('/token', validateToken, (req, res) => {
     jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
         err
             ? res.json(null)
-            : res.json(decoded.user_id)
+            : res.json(decoded)
     })
 })
 
 app.post('/signup', (req, res) => {
-    const { user } = req.body
-    db.createUser(user)
+    const { email, name, password } = req.body
+    db.createUser({email, name, password})
         .then(result => {
             if (typeof result[0] == 'number'){
                 let token = createToken({ user_id: result[0], email: user.email })
