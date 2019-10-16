@@ -20,14 +20,41 @@ app.post('/soil_data', (req, res) => {
     res.json(`Body: ${req.body.name} and Headers: ${req.headers.authorization} to backend`)
 })
 
-app.post('/login', validateToken, (req, res) => {
-    res.json('hit login endpoint')
+app.post('/login', (req, res) => {
+    const { email, password } = req.body
+    email && password
+        ? db.verifyUser(email, password)
+            .then(result => {
+                if (typeof result == 'number' && result == true){
+                    let token = createToken({ user_id: result, email })
+                    res.json(token)
+                } else {
+                    res.json(null)
+                }
+            })
+        : res.json(null)
+})
+
+app.post('/token', validateToken, (req, res) => {
+    jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
+        err
+            ? res.json(null)
+            : res.json(decoded.user_id)
+    })
 })
 
 app.post('/signup', (req, res) => {
-    const { name, email, password } = req.body
-    console.log(name, email, password)
-    res.json('signup endpoint hit')
+    const { user } = req.body
+    db.createUser(user)
+        .then(result => {
+            if (typeof result[0] == 'number'){
+                let token = createToken({ user_id: result[0], email: user.email })
+                res.json(token)
+            } else {
+                res.json(null)
+            }
+        })
+        .catch(() => res.json(null))
 })
 
 app.get('/:id', (req, res) => {
