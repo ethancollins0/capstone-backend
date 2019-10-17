@@ -25,15 +25,12 @@ app.post('/login', (req, res) => {
     console.log(`hit login with an email and password of ${email} and ${password}`)
     email && password
         ? db.verifyUser(email, password)
-            .then(result => {
-                if (result){
-                    db.getUserById(result)
-                        .then(user => {
-                            const { name } = user
-                            let token = createToken({ user_id: result, email, name })
-                            res.json(token)
-                        })
-                } else {
+            .then(user => {
+                if (user){
+                        const { name } = user
+                        let token = createToken({ user_id: user.id, email, name })
+                        res.json(token)
+                    } else {
                     res.json(null)
                 }
             })

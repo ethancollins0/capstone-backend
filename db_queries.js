@@ -36,7 +36,7 @@ function verifyUser(email, password){
                     .then(user => {
                         return bcrypt.compare(password, user.password).then(res => {
                             return res
-                                ? knex('users').where({ email: email }).first().then(user => user.id)
+                                ? knex('users').where({ email: email }).first()
                                 : null
                         })
                     })
