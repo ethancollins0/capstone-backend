@@ -19,6 +19,10 @@ function createUser(user) {
         })
 }
 
+function getUserById(id){
+    return knex('users').where({ id }).first()
+}
+
 function doesExist(email){
     return knex('users').where({ email })
 }
@@ -45,5 +49,6 @@ function verifyUser(email, password){
 module.exports = {
     createPi,
     createUser,
-    verifyUser
+    verifyUser,
+    getUserById
 }

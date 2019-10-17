@@ -20,13 +20,19 @@ app.post('/soil_data', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
+    
     const { email, password } = req.body
+    console.log(`hit login with an email and password of ${email} and ${password}`)
     email && password
         ? db.verifyUser(email, password)
             .then(result => {
                 if (result){
-                    let token = createToken({ user_id: result, email })
-                    res.json(token)
+                    db.getUserById(result)
+                        .then(user => {
+                            const { name } = user
+                            let token = createToken({ user_id: result, email, name })
+                            res.json(token)
+                        })
                 } else {
                     res.json(null)
                 }
@@ -36,6 +42,7 @@ app.post('/login', (req, res) => {
 
 app.post('/token', validateToken, (req, res) => {
     jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
+        console.log(`reached verify with decoded of ${decoded}`)
         err
             ? res.json(null)
             : res.json(decoded)
@@ -47,7 +54,7 @@ app.post('/signup', (req, res) => {
     db.createUser({email, name, password})
         .then(result => {
             if (typeof result[0] == 'number'){
-                let token = createToken({ user_id: result[0], email: user.email })
+                let token = createToken({ user_id: result[0], email, name })
                 res.json(token)
             } else {
                 res.json(null)
