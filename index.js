@@ -9,23 +9,40 @@ const db = require('./db_queries')
 
 dotenv.config()
 
-
 const app = express()
-const User = require('./models/User')
+// const User = require('./models/User')
 
-app.use(cors())
+const whitelist = ['http://localhost:8080', 'https://capstone-frontend.firebaseapp.com']
+const corsOptions = {
+    credentials: true,
+    origin: (origin, callback) => {
+        return whitelist.includes(origin)
+            ? callback(null, true)
+            : callback(new Error('Not allowed by CORS'))
+    }
+}
+
+app.use(cors(corsOptions))
 app.use(bodyParser.urlencoded())
 app.use(bodyParser.json())
 
 const http = require('http').Server(app)
-const io = require('socket.io')
+const io = require('socket.io')(http)
+
+io.on('connection', socket => {
+    console.log('client connected')
+    socket.emit('data', {id: `Here's the data from server: ${socket.request._query.id}`})
+})
+
+http.listen(3001, () => {
+    console.log('socket listening on 3001...')
+})
 
 app.post('/soil_data', (req, res) => {
     res.json(`Body: ${req.body.name} and Headers: ${req.headers.authorization} to backend`)
 })
 
 app.post('/login', (req, res) => {
-    
     const { email, password } = req.body
     email && password
         ? db.verifyUser(email, password)
@@ -63,14 +80,6 @@ app.post('/signup', (req, res) => {
             }
         })
         .catch(() => res.json(null))
-})
-
-app.get('/:id', (req, res) => {
-    let id = +req.params.id
-    User.query()
-        .where('id', id)
-        .eager('systems')
-        .then(user => res.json(user))
 })
 
 app.post('/pi', validateToken, (req, res) => {
