@@ -34,12 +34,16 @@ io.on('connection', socket => {
     socket.emit('data', {id: `Here's the data from server: ${socket.request._query.id}`})
 })
 
-http.listen(3001, () => {
+http.listen(process.env.PORT || 3001, () => {
     console.log('socket listening on 3001...')
 })
 
 app.post('/soil_data', (req, res) => {
     res.json(`Body: ${req.body.name} and Headers: ${req.headers.authorization} to backend`)
+})
+
+app.get('/port', (req, res) => {
+    res.json(process.env.PORT || 3001)
 })
 
 app.post('/login', (req, res) => {
@@ -126,6 +130,6 @@ function validateToken(req, res, next){
 
 const port = process.env.PORT || 3002
 
-app.listen(port, () => {
-    console.log(`listening on ${port}...`)
-})
+// app.listen(port, () => {
+//     console.log(`listening on ${port}...`)
+// })
