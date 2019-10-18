@@ -1,9 +1,14 @@
 const knex = require('./knex')
 const bcrypt = require('bcrypt')
 
-function createPi(user_id, pi){
-    const {name, description} = pi
-    knex('systems').insert([{ name, description, user_id }])
+function createPi(id, pi){
+    const {name, description, model} = pi
+    return knex('users').where({ id }).first()
+        .then(user => knex('systems').returning('id').insert([{ name, description, model, user_id: user.id }]))
+}
+
+function getUserSystems(user_id){
+    return knex('systems').where({ user_id })
 }
 
 function createUser(user) {
@@ -50,5 +55,6 @@ module.exports = {
     createPi,
     createUser,
     verifyUser,
-    getUserById
+    getUserById,
+    getUserSystems
 }

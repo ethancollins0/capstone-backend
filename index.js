@@ -4,6 +4,9 @@ const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 const db = require('./db_queries')
+
+
+
 dotenv.config()
 
 
@@ -14,6 +17,8 @@ app.use(cors())
 app.use(bodyParser.urlencoded())
 app.use(bodyParser.json())
 
+const http = require('http').Server(app)
+const io = require('socket.io')
 
 app.post('/soil_data', (req, res) => {
     res.json(`Body: ${req.body.name} and Headers: ${req.headers.authorization} to backend`)
@@ -22,7 +27,6 @@ app.post('/soil_data', (req, res) => {
 app.post('/login', (req, res) => {
     
     const { email, password } = req.body
-    console.log(`hit login with an email and password of ${email} and ${password}`)
     email && password
         ? db.verifyUser(email, password)
             .then(user => {
@@ -39,10 +43,11 @@ app.post('/login', (req, res) => {
 
 app.post('/token', validateToken, (req, res) => {
     jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
-        console.log(`reached verify with decoded of ${decoded}`)
         err
             ? res.json(null)
-            : res.json(decoded)
+            : db.getUserSystems(decoded.user_id)
+                .then(systems => res.json({user: decoded, systems}))
+                
     })
 })
 
@@ -69,16 +74,22 @@ app.get('/:id', (req, res) => {
 })
 
 app.post('/pi', validateToken, (req, res) => {
-    const { user_id, pi } = req.body
-    user_id && pi.name && pi.description
-        ? res.json('here')
-        : res.json(null)
+    jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
+        const { user_id } = decoded
+        const {name, description, model} = req.body
+        user_id && name && description && model
+            ? db.createPi(user_id, req.body)
+                .then(result => typeof result[0] == 'number' 
+                    ? res.json(result[0]) 
+                    : res.json(null))
+                .catch(() => res.json(null))
+            : res.json(null)
+    })
 })
 
 app.post('/livedata', validateToken, (req, res) => {
     console.log(req.token)
     jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
-        console.log(decoded)
         if (err){
             res.json(err)
         } else {
@@ -93,15 +104,15 @@ function createToken(data){
 
 function validateToken(req, res, next){
     const bearerHeader = req.headers['authorization'];
-        if (typeof bearerHeader == 'string'){
-            const bearer = bearerHeader.split(' ')
-            const bearerToken = bearer[1]
-            req.token = bearerToken
-            next();
-        } else {
-            res.json('forbidden')
-        }
+    if (typeof bearerHeader == 'string'){
+        const bearer = bearerHeader.split(' ')
+        const bearerToken = bearer[1]
+        req.token = bearerToken
+        next();
+    } else {
+        res.json('forbidden')
     }
+}
 
 
 const port = process.env.PORT || 3002
