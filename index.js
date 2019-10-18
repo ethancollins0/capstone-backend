@@ -35,7 +35,9 @@ io.on('connection', socket => {
             // io.emit('works')
             if (decoded.user_id && decoded.pi_id){
                 socket.join(`${decoded.user_id}${decoded.pi_id}`)
+                io.emit('works')
             } else {
+                io.emit('works')
                 socket.join(`${decoded.user_id}${socket.request._query.pi_id}`)
                 // io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('online')
                 // if (socket.clients(`${decoded.user_id}${socket.request._query.pi_id}`).length == 1){
@@ -43,7 +45,7 @@ io.on('connection', socket => {
             }
             setTimeout(() => {
                 let clients = io.sockets.adapter.rooms[`${decoded.user_id}${socket.request._query.pi_id}`]
-                if (clients.length > 1){
+                if (clients && clients.length > 1){
                     io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('online')
                 }
             }, 2000)
