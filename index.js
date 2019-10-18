@@ -32,7 +32,7 @@ io.on('connection', socket => {
         if (err){
             socket.disconnect()
         } else {
-            io.emit('works')
+            // io.emit('works')
             if (decoded.user_id && decoded.pi_id){
                 socket.join(`${decoded.user_id}${decoded.pi_id}`)
             } else {
