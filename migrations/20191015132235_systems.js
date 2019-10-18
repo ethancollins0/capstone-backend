@@ -4,6 +4,7 @@ exports.up = function(knex) {
         t.increments('id')
         t.string('name')
         t.string('description')
+        t.string('model')
         t.integer('user_id').unsigned().notNullable()
         t.foreign('user_id').references('id').inTable('users')
     })
