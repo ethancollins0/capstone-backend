@@ -32,6 +32,7 @@ io.on('connection', socket => {
         if (err){
             socket.disconnect()
         } else {
+            socket.emit('new connection')
             if (decoded.user_id && decoded.pi_id){
                 socket.join(`${decoded.user_id}${decoded.pi_id}`)
             } else {
