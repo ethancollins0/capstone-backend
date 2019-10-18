@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 const db = require('./db_queries')
 
-
-
 dotenv.config()
 
 const app = express()
@@ -30,8 +28,26 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 
 io.on('connection', socket => {
-    console.log('client connected')
-    socket.emit('data', {id: `Here's the data from server: ${socket.request._query.id}`})
+    jwt.verify(socket.request._query.token, process.env.SECRET, (err, decoded) => {
+        if (err){
+            socket.disconnect()
+        } else {
+            if (decoded.user_id && decoded.pi_id){
+                socket.join(`${decoded.user_id}${decoded.pi_id}`)
+            } else {
+                socket.join(`${decoded.user_id}${socket.request._query.pi_id}`)
+                // io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('online')
+                // if (socket.clients(`${decoded.user_id}${socket.request._query.pi_id}`).length == 1){
+                // }
+            }
+            setTimeout(() => {
+                let clients = io.sockets.adapter.rooms[`${decoded.user_id}${socket.request._query.pi_id}`]
+                if (clients.length > 1){
+                    io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('online')
+                }
+            }, 2000)
+        }
+    })
 })
 
 http.listen(process.env.PORT || 3001, () => {
@@ -93,21 +109,10 @@ app.post('/pi', validateToken, (req, res) => {
         user_id && name && description && model
             ? db.createPi(user_id, req.body)
                 .then(result => typeof result[0] == 'number' 
-                    ? res.json(result[0]) 
+                    ? res.json(createToken({ user_id, pid_id: result[0] }))
                     : res.json(null))
                 .catch(() => res.json(null))
             : res.json(null)
-    })
-})
-
-app.post('/livedata', validateToken, (req, res) => {
-    console.log(req.token)
-    jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
-        if (err){
-            res.json(err)
-        } else {
-            res.json(decoded)
-        }
     })
 })
 
