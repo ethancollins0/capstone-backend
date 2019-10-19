@@ -52,15 +52,15 @@ io.on('connection', socket => {
             }
         }
         socket.on('disconnect', () => {
-            
+
         })
 
-        // socket.on('water_data', data => {
-        //     jwt.verify(data.token, process.env.SECRET, (err, decoded) => {
-        //         if (err) throw err;
-        //         io.in(`${decoded.user_id}${decoded.pi_id}`).emit('water', {water: decoded.data})
-        //     })
-        // })
+        socket.on('water_data', data => {
+            jwt.verify(data.token, process.env.SECRET, (err, decoded) => {
+                if (err) throw err;
+                io.in(`${decoded.user_id}${decoded.pi_id}`).emit('water', {water: decoded.data})
+            })
+        })
     })
 })
 
