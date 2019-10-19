@@ -53,6 +53,11 @@ io.on('connection', socket => {
         }
         socket.on('disconnect', () => {
             delete socket
+            if (decoded.user_id && decoded.pi_id){
+                io.in(`${decoded.user_id}${decoded.pi_id}`).emit('length', clients.length)
+            } else {
+                io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('length', clients.length)
+            }
         })
     })
 })
@@ -116,7 +121,7 @@ app.post('/pi', validateToken, (req, res) => {
         user_id && name && description && model
             ? db.createPi(user_id, req.body)
                 .then(result => typeof result[0] == 'number' 
-                    ? res.json(createToken({ user_id, pid_id: result[0] }))
+                    ? res.json(createToken({ user_id, pi_id: result[0] }))
                     : res.json(null))
                 .catch(() => res.json(null))
             : res.json(null)
@@ -124,6 +129,7 @@ app.post('/pi', validateToken, (req, res) => {
 })
 
 function createToken(data){
+        console.log(data)
         return jwt.sign(data, process.env.SECRET, {expiresIn: 60 * 60 * 24 * 30})
 }
 
