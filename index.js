@@ -52,7 +52,6 @@ io.on('connection', socket => {
             }
         }
         socket.on('disconnect', () => {
-            delete socket
             if (decoded.user_id && decoded.pi_id){
                 io.in(`${decoded.user_id}${decoded.pi_id}`).emit('length', clients.length)
             } else {
@@ -60,12 +59,12 @@ io.on('connection', socket => {
             }
         })
 
-        socket.on('water_data', data => {
-            jwt.verify(data.token, process.env.SECRET, (err, decoded) => {
-                if (err) throw err;
-                io.in(`${decoded.user_id}${decoded.pi_id}`).emit('water', {water: decoded.data})
-            })
-        })
+        // socket.on('water_data', data => {
+        //     jwt.verify(data.token, process.env.SECRET, (err, decoded) => {
+        //         if (err) throw err;
+        //         io.in(`${decoded.user_id}${decoded.pi_id}`).emit('water', {water: decoded.data})
+        //     })
+        // })
     })
 })
 
