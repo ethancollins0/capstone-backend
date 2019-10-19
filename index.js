@@ -37,18 +37,21 @@ io.on('connection', socket => {
                 socket.join(`${decoded.user_id}${decoded.pi_id}`)
                 let clients = io.sockets.adapter.rooms[`${decoded.user_id}${decoded.pi_id}`]
                 if (clients && clients.length > 1){
-                    io.in(`${decoded.user_id}${decoded.pi_id}`).emit('online')
+                    io.in(`${decoded.user_id}${decoded.pi_id}`).emit('length', clients.length   )
                 }
-                console.log('pi', clients.length)
+                io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('length', clients.length)
             } else {
                 socket.join(`${decoded.user_id}${socket.request._query.pi_id}`)
                 let clients = io.sockets.adapter.rooms[`${decoded.user_id}${socket.request._query.pi_id}`]
                 if (clients && clients.length > 1){
                     io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('online')
                 }
-                console.log('browser',clients.length)
+                io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('length', {clients: clients.length})
             }
         }
+        socket.on('disconnect', () => {
+            delete socket
+        })
     })
 })
 
