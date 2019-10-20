@@ -68,10 +68,6 @@ http.listen(process.env.PORT || 3001, () => {
     console.log('socket listening on 3001...')
 })
 
-app.post('/soil_data', (req, res) => {
-    res.json(`Body: ${req.body.name} and Headers: ${req.headers.authorization} to backend`)
-})
-
 app.get('/port', (req, res) => {
     res.json(process.env.PORT || 3001)
 })
@@ -99,6 +95,16 @@ app.post('/token', validateToken, (req, res) => {
             : db.getUserSystems(decoded.user_id)
                 .then(systems => res.json({user: decoded, systems}))
                 
+    })
+})
+
+app.post('/pi/token', validateToken, (req, res) => {
+    jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
+        err
+            ? res.json(null)
+            : res.json(createToken({ user_id: decoded.user_id, 
+                                     pi_id: req.body.pi_id 
+                                    }))
     })
 })
 
