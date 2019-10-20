@@ -51,21 +51,22 @@ io.on('connection', socket => {
                 io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('length', clients.length)
             }
         }
-        socket.on('disconnect', () => {
-            delete socket
-            io.emit('unit_disconnect')
-            console.log('unit disconnected')
-        })
-
+        
         socket.on('get_length', () => {
             io.in(`${decoded.user_id}${decoded.pi_id}`).emit('length', clients.length)
         })
-
+        
         socket.on('water_data', (data) => {
             jwt.verify(data.token, process.env.SECRET, (err, decoded) => {
                 if (err) throw err;
                 io.in(`${decoded.user_id}${decoded.pi_id}`).emit('water', {water: data.water})
             })
+        })
+        
+        socket.on('disconnect', () => {
+            delete socket
+            io.emit('unit_disconnect')
+            console.log('unit disconnected')
         })
     })
 })
