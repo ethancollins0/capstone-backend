@@ -53,7 +53,8 @@ io.on('connection', socket => {
         }
         
         socket.on('get_length', () => {
-            io.in(`${decoded.user_id}${decoded.pi_id}`).emit('length', clients.length)
+            let clients = io.sockets.adapter.rooms[`${decoded.user_id}${socket.request._query.pi_id}`]
+            io.in(`${decoded.user_id}${socket.request._query.pi_id}`).emit('length', clients.length)
         })
         
         socket.on('water_data', (data) => {
@@ -62,10 +63,10 @@ io.on('connection', socket => {
                 io.in(`${decoded.user_id}${decoded.pi_id}`).emit('water', {water: data.water})
             })
         })
-        
+
         socket.on('disconnect', () => {
             delete socket
-            io.emit('unit_disconnect')
+            io.sockets.emit('unit_disconnect')
             console.log('unit disconnected')
         })
     })
