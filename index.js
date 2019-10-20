@@ -52,6 +52,7 @@ io.on('connection', socket => {
             }
         }
         socket.on('disconnect', () => {
+            delete socket
             if (decoded.user_id && decoded.pi_id){
                 let clients = io.sockets.adapter.rooms[`${decoded.user_id}${decoded.pi_id}`]
                 io.in(`${decoded.user_id}${decoded.pi_id}`).emit('length', clients.length)
