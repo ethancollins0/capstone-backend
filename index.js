@@ -52,6 +52,7 @@ io.on('connection', socket => {
             }
         }
         socket.on('disconnect', () => {
+            delete socket
             io.emit('unit_disconnect')
             console.log('unit disconnected')
         })
