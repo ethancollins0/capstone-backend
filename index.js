@@ -133,8 +133,8 @@ app.post('/signup', (req, res) => {
 app.post('/pi', validateToken, (req, res) => {
     jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
         const { user_id } = decoded
-        const {name, description, model} = req.body
-        user_id && name && description && model
+        const {name, model} = req.body
+        user_id && name && model
             ? db.createPi(user_id, req.body)
                 .then(result => typeof result[0] == 'number' 
                     ? res.json(createToken({ user_id, pi_id: result[0] }))
