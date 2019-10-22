@@ -144,6 +144,21 @@ app.post('/pi', validateToken, (req, res) => {
     })
 })
 
+app.delete('/pi', validateToken, (req, res) => {
+    jwt.verify(req.token, process.env.SECRET, (err, decoded) => {
+        const { user_id } = decoded
+        const { pi_id } = req.body
+        user_id && pi_id
+            ? db.deletePi(user_id, pi_id)
+                .then(result => {
+                    result == 1
+                        ? res.json(true)
+                        : res.json(null)
+                })
+            : res.json(null)
+    })
+})
+
 function createToken(data){
         console.log(data)
         return jwt.sign(data, process.env.SECRET, {expiresIn: 60 * 60 * 24 * 30})

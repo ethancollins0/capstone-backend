@@ -2,9 +2,15 @@ const knex = require('./knex')
 const bcrypt = require('bcrypt')
 
 function createPi(id, pi){
-    const {name, description, model} = pi
+    const {name, model} = pi
     return knex('users').where({ id }).first()
-        .then(user => knex('systems').returning('id').insert([{ name, description, model, user_id: user.id }]))
+        .then(user => knex('systems').returning('id').insert([{ name, model, user_id: user.id }]))
+}
+
+function deletePi(user_id, pi_id){
+    return knex('systems').where({ user_id }).where({ id: pi_id })
+        ? knex('systems').where({ user_id }).where({ id: pi_id }).del()
+        : null
 }
 
 function getUserSystems(user_id){
@@ -56,5 +62,6 @@ module.exports = {
     createUser,
     verifyUser,
     getUserById,
-    getUserSystems
+    getUserSystems,
+    deletePi
 }
