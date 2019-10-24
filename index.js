@@ -121,7 +121,9 @@ app.post('/signup', (req, res) => {
     db.createUser({email, name, password})
         .then(result => {
             if (typeof result[0] == 'number'){
-                let token = createToken({ user_id: result[0], email, name })
+                let token = createToken({ user_id: result[0], 
+                                          email, name 
+                                        })
                 res.json(token)
             } else {
                 res.json(null)
